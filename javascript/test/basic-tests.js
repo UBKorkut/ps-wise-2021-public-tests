@@ -3,16 +3,15 @@ const assert = require('assert');
 
 const fs = require("fs");
 const path = require("path");
-const { exitCode } = require('process');
 
 const { stdin } = require('mock-stdin');
 
 
 // Find your module using the --minesweeper_home variable and the default name 'minesweeper'
-const pahHome = process.env.npm_config_minesweeper_home.endsWith("/")
+const minesweeperHome = process.env.npm_config_minesweeper_home.endsWith("/")
   ? process.env.npm_config_minesweeper_home
   : process.env.npm_config_minesweeper_home + "/";
-const pah = require(pahHome + "minesweeper");
+const minesweeper = require(minesweeperHome + "minesweeper");
 
 describe('Basic Tests', function() {
     
@@ -38,31 +37,37 @@ describe('Basic Tests', function() {
             }
         });
 
-        it('Minesweeper should exit with code 1 if input file does not exist is missing', function() {
-            exitCode = pah.main(minesweeper_inputs)
+        it('Minesweeper should exit with code 1 if input file is not provided', function() {
+            var exitCode = minesweeper.main()
             assert.strictEqual(exitCode, 1, "Wrong exit code for missing board configuration file")
+        });
+
+        it('Minesweeper should exit with code 1 if input file does not exist is missing', function() {
+            var exitCode = minesweeper.main("simple.cfg")
+            assert.strictEqual(exitCode, 1, "Wrong exit code for not existent board configuration file")
         });
         
         it('Minesweeper should exit with code 2 if input file is empty', function() {
             // Make sure there's an empty "simple.cfg" file (see https://flaviocopes.com/how-to-create-empty-file-node/)
             fs.closeSync(fs.openSync("simple.cfg", 'w'))
-            exitCode = pah.main(minesweeper_inputs)
+
+            var stats = fs.statSync("simple.cfg")
+            console.log("FILE SIZE", stats.size)
+
+            var exitCode = minesweeper.main("simple.cfg")
+
             assert.strictEqual(exitCode, 2, "Wrong exit code for invalid (empty) board configuration file")
         });
     });
 
     describe('Runs with null exit code.  Tag: Assignment1, Assignment2, Assignment3, Assignment4, Assignment5', function() {
 
-        let stdin = null
+        var stdin;
 
         beforeEach("Ensure no simple.cfg before execution", function(){
             if( fs.existsSync("simple.cfg")){
                 fs.unlinkSync("simple.cfg");
             }
-        });
-
-        beforeEach("Start Mockin stdin", function(){
-            stdin = require('mock-stdin').stdin();
         });
 
         afterEach("Ensure no simple.cfg after execution", function(){
@@ -71,6 +76,10 @@ describe('Basic Tests', function() {
             }
         });
 
+        beforeEach("Start Mockin stdin", function(){
+            stdin = require('mock-stdin').stdin();
+        });
+        
         afterEach("Stop Mocking stdin", function(){
             stdin.end();
         });
@@ -80,16 +89,12 @@ describe('Basic Tests', function() {
             const lines = ['..*', '...', '...'];
             fs.writeFileSync("simple.cfg", lines.join('\n'))
             // Prepare the inputs
-            stdin.send("1 1 R", "ascii");
+            // stdin.send("1 1 R", "ascii");
             
             // Execute Minesweeper. This should pick up the mocked stdin
-            exitCode = pah.main("simple.cfg")
+            var exitCode = minesweeper.main("simple.cfg")
 
             assert.strictEqual(exitCode, 0, "Wrong exit for valid (won) game")
-
-            // 
-            stdin.end();
-
         });
     });
 });

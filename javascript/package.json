@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test": "mocha --no-color"
+    "test": "mocha --no-color --verbose=true"
   },
   "dependencies": {
     "mocha": "^8.2.1",
