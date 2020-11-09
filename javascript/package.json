@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "test": "mocha --no-color"
+  },
+  "dependencies": {
+    "mocha": "^8.2.1",
+    "mock-stdin": "^1.0.0"
+  }
+}
