@@ -52,7 +52,6 @@ describe('Basic Tests', function() {
             fs.closeSync(fs.openSync("simple.cfg", 'w'))
 
             var stats = fs.statSync("simple.cfg")
-            console.log("FILE SIZE", stats.size)
 
             var exitCode = minesweeper.main("simple.cfg")
 
