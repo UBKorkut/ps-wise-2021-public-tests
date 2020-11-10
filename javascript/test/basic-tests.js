@@ -42,12 +42,12 @@ describe('Basic Tests', function() {
             assert.strictEqual(exitCode, 1, "Wrong exit code for missing board configuration file")
         });
 
-        it('Minesweeper should exit with code 1 if input file does not exist is missing', function() {
+        it('Minesweeper should exit with code 1 if input file does not exist', function() {
             var exitCode = minesweeper.main("simple.cfg")
             assert.strictEqual(exitCode, 1, "Wrong exit code for not existent board configuration file")
         });
         
-        it('Minesweeper should exit with code 2 if input file is empty', function() {
+        it('Minesweeper should exit with code 2 if input file is invalid (empty)', function() {
             // Make sure there's an empty "simple.cfg" file (see https://flaviocopes.com/how-to-create-empty-file-node/)
             fs.closeSync(fs.openSync("simple.cfg", 'w'))
 
@@ -83,7 +83,7 @@ describe('Basic Tests', function() {
             stdin.end();
         });
 
-        it('Preys and Hunters should raise no exception', function() {
+        it('Minesweeper should raise no exception', function() {
             // Creates the simple.cfg file
             const lines = ['..*', '...', '...'];
             fs.writeFileSync("simple.cfg", lines.join('\n'))
