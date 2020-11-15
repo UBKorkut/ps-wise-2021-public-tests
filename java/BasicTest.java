@@ -105,6 +105,17 @@ public class BasicTest {
 	}
 
 	@Test(timeout = 3000)
+	public void testConfigurationIsNotARegularFile() throws Exception {
+		File folder = tempFolder.newFolder();
+		Map<String, Object> result = MinesweeperTestUtils.execute(folder, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+
+		Assert.assertEquals(
+				MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " started when given a folder as configuration file", 1,
+				exitCode);
+	}
+
+	@Test(timeout = 3000)
 	public void testInvalidFilenameOnlySuffixMixedCase() throws Exception {
 		final File boardCfgFile = tempFolder.newFile(".CfG");
 		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
@@ -176,6 +187,74 @@ public class BasicTest {
 		Assert.assertEquals(
 				MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted configuration that is not rectangular", 2,
 				exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testMaxRows() throws Exception {
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			for (int i = 0; i < 21; i++) {
+				out.println("..*");
+			}
+		}
+
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+
+		Assert.assertEquals(
+				MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted configuration that has too many rows", 2,
+				exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testMaxColumns() throws Exception {
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			for (int i = 0; i < 21; i++) {
+				out.print(".");
+			}
+			out.println();
+		}
+
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+
+		Assert.assertEquals(
+				MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted configuration that has too many columns", 2,
+				exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testOnlyMines() throws Exception {
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			out.println("***");
+		}
+
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+
+		Assert.assertEquals(
+				MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted configuration that contains only mines", 2,
+				exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testTooSmall() throws Exception {
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			out.println(".");
+		}
+
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+
+		Assert.assertEquals(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME
+				+ " accepted configuration that has only a single square that is not a mine", 2, exitCode);
 	}
 
 	@Test(timeout = 3000)
