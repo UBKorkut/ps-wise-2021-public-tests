@@ -86,7 +86,7 @@ describe('Basic Tests', function() {
         it('Minesweeper should raise no exception', function() {
             // Creates the simple.cfg file
             const lines = ['..*', '...', '...'];
-            fs.writeFileSync("simple.cfg", lines.join('\n'))
+            fs.writeFileSync("simple.cfg", lines.join('\n') + '\n')
             // Prepare the inputs
             // stdin.send("1 1 R", "ascii");
             
