@@ -6,10 +6,13 @@
  */
 //See https://www.baeldung.com/hamcrest-text-matchers
 import static org.hamcrest.text.IsBlankString.blankOrNullString;
+import static org.hamcrest.core.StringEndsWith.endsWith;
 
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -82,4 +85,161 @@ public class BasicTest {
 		MatcherAssert.assertThat(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " did not produced any output!", stdOut,
 				Matchers.not(blankOrNullString()));
 	}
+
+	@Test(timeout = 3000)
+	public void testNoConfigurationPassed() throws Exception {
+		Map<String, Object> result = MinesweeperTestUtils.execute(null, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+
+		Assert.assertEquals(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " started without passed configuration", 1,
+				exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testConfigurationNotExisting() throws Exception {
+		Map<String, Object> result = MinesweeperTestUtils.execute(new File("nope.cfg"), Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+
+		Assert.assertEquals(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " started without existing configuration", 1,
+				exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testInvalidFilenameOnlySuffixMixedCase() throws Exception {
+		final File boardCfgFile = tempFolder.newFile(".CfG");
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+		Assert.assertEquals(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted invalid file name '.CfG'", 2,
+				exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testInvalidFilenameWrongSuffixFormat() throws Exception {
+		final File boardCfgFile = tempFolder.newFile("test.ccfg");
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+		Assert.assertEquals(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted invalid file name 'test.ccfg'", 2,
+				exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testInvalidFilenameWrongSuffix() throws Exception {
+		final File boardCfgFile = tempFolder.newFile("test.foo");
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+		Assert.assertEquals(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted invalid file name 'test.foo'", 2,
+				exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testEmptyConfiguration() throws Exception {
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			out.println("");
+		}
+
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+
+		Assert.assertEquals(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted empty configuration", 2, exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testInvalidContentInConfiguration() throws Exception {
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			out.println("a");
+		}
+
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+
+		Assert.assertEquals(
+				MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted configuration with invalid content", 2,
+				exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testNonRectangularConfiguration() throws Exception {
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			out.println("...");
+			out.println("*");
+		}
+
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+
+		Assert.assertEquals(
+				MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted configuration that is not rectangular", 2,
+				exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testLossWithInitialMineHit() throws Exception {
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			out.println("..*");
+			out.println("...");
+			out.println("...");
+		}
+
+		// Reveal mine.
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Arrays.asList("1 3 R"));
+		int exitCode = (Integer) result.get("exitCode");
+		String stdOut = (String) result.get("stdOut");
+
+		Assert.assertEquals(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " did not exit normally after loss", 0,
+				exitCode);
+		MatcherAssert.assertThat(
+				MinesweeperTestUtils.MINESWEEPER_CLASS_NAME
+						+ " does not display the hit mine and loss message after loss",
+				stdOut, endsWith("┌───┬───┬───┐\n"//
+						+ "│   │   │ * │\n"//
+						+ "├───┼───┼───┤\n"//
+						+ "│   │   │   │\n"//
+						+ "├───┼───┼───┤\n"//
+						+ "│   │   │   │\n"//
+						+ "└───┴───┴───┘\n"//
+						+ "╔═══════════╗\n"//
+						+ "║You Lost!  ║\n"//
+						+ "╚═══════════╝\n"));
+	}
+
+	@Test(timeout = 3000)
+	public void testWinWithInitialMineAvoided() throws Exception {
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			out.println("..*");
+			out.println("...");
+			out.println("...");
+		}
+
+		// Reveal empty square.
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Arrays.asList("1 1 R"));
+		int exitCode = (Integer) result.get("exitCode");
+		String stdOut = (String) result.get("stdOut");
+
+		Assert.assertEquals(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " did not exit normally after win", 0,
+				exitCode);
+		MatcherAssert.assertThat(
+				MinesweeperTestUtils.MINESWEEPER_CLASS_NAME
+						+ " does not display uncovered squares and win message after win",
+				stdOut, endsWith("┌───┬───┬───┐\n"//
+						+ "│ ▓ │ 1 │   │\n"//
+						+ "├───┼───┼───┤\n"//
+						+ "│ ▓ │ 1 │ 1 │\n"//
+						+ "├───┼───┼───┤\n"//
+						+ "│ ▓ │ ▓ │ ▓ │\n"//
+						+ "└───┴───┴───┘\n"//
+						+ "╔═══════════╗\n"//
+						+ "║You Won!   ║\n"//
+						+ "╚═══════════╝\n"));
+	}
+
 }
