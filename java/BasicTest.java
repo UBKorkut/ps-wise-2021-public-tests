@@ -105,6 +105,17 @@ public class BasicTest {
 	}
 
 	@Test(timeout = 3000)
+	public void testConfigurationIsNotARegularFile() throws Exception {
+		File folder = tempFolder.newFolder();
+		Map<String, Object> result = MinesweeperTestUtils.execute(folder, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+
+		Assert.assertEquals(
+				MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " started when given a folder as configuration file", 1,
+				exitCode);
+	}
+
+	@Test(timeout = 3000)
 	public void testInvalidFilenameOnlySuffixMixedCase() throws Exception {
 		final File boardCfgFile = tempFolder.newFile(".CfG");
 		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
@@ -177,5 +188,4 @@ public class BasicTest {
 				MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted configuration that is not rectangular", 2,
 				exitCode);
 	}
-
 }
