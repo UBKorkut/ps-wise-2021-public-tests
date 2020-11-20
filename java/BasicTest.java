@@ -106,7 +106,7 @@ public class BasicTest {
 
 	@Test(timeout = 3000)
 	public void testConfigurationIsNotARegularFile() throws Exception {
-		File folder = tempFolder.newFolder();
+		File folder = tempFolder.newFolder("simple.cfg");
 		Map<String, Object> result = MinesweeperTestUtils.execute(folder, Collections.emptyList());
 		int exitCode = (Integer) result.get("exitCode");
 
