@@ -111,7 +111,9 @@ public class BasicTest {
 		int exitCode = (Integer) result.get("exitCode");
 
 		Assert.assertEquals(
-				MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " started when given a folder as configuration file", 1,
+				MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " started when given a folder as configuration file", 
+				// According to #12 a folder that exists is an invalid file, not a missing file. So the right exit code is 2
+				2,
 				exitCode);
 	}
 
