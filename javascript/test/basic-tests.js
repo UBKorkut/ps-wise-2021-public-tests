@@ -5,7 +5,8 @@ const fs = require("fs");
 const path = require("path");
 
 const { stdin } = require('mock-stdin');
-
+const { spawn } = require('child_process');
+const readline = require('readline');
 
 // Find your module using the --minesweeper_home variable and the default name 'minesweeper'
 const minesweeperHome = process.env.npm_config_minesweeper_home.endsWith("/")
@@ -94,6 +95,68 @@ describe('Basic Tests', function() {
             var exitCode = minesweeper.main("simple.cfg")
 
             assert.strictEqual(exitCode, 0, "Wrong exit for valid (won) game")
+        });
+
+        it('Win Minesweeper after first move', function() {
+            // Creates the simple.cfg file
+            const lines = ['..*', '...', '...'];
+            fs.writeFileSync("simple.cfg", lines.join('\n') + '\n')
+            var lengthUI = (lines.length * 2 + 1) + 3; // first part for the board + three lines for the message box
+
+            var expectedBoards = [
+                  "┌───┬───┬───┐\n"
+                + "│   │   │   │\n"
+                + "├───┼───┼───┤\n"
+                + "│   │   │   │\n"
+                + "├───┼───┼───┤\n"
+                + "│   │   │   │\n"
+                + "└───┴───┴───┘\n"
+                + "╔═══════════╗\n"
+                + "║           ║\n"
+                + "╚═══════════╝\n",
+                  "┌───┬───┬───┐\n"
+                + "│ ▓ │ 1 │   │\n"
+                + "├───┼───┼───┤\n"
+                + "│ ▓ │ 1 │ 1 │\n"
+                + "├───┼───┼───┤\n"
+                + "│ ▓ │ ▓ │ ▓ │\n"
+                + "└───┴───┴───┘\n"
+                + "╔═══════════╗\n"
+                + "║You Won!   ║\n"
+                + "╚═══════════╝\n"
+            ]
+            
+            // spawn child process to execute Minesweeper instance
+            minesweeperProcess = spawn('node', [minesweeperHome + "minesweeper.js", "simple.cfg"]);
+            
+            // send inputs to the subprocess
+            minesweeperProcess.stdin.write("1 1 R\n");
+
+            // observe stdout of the child process and verify the correctness of the board + message box
+            // after each UI refresh, i.e. move
+            var actualBoard = [];
+            var moveCount = 0;
+
+            const rl = readline.createInterface({ input: minesweeperProcess.stdout });
+            rl.on('line', line => {
+                if (!line.includes(">")) { // only check the board + message box in this test case
+                    actualBoard.push(line);
+            
+                    if (actualBoard.length==lengthUI) {
+                        assert.strictEqual(actualBoard.join('\n') + '\n',  expectedBoards[moveCount], 
+                            "Actual board after move " + (moveCount + 1) + " is wrong");
+                            
+                        if (moveCount==expectedBoards.length-1) { // end of the game is reached
+                            rl.close();
+                            minesweeperProcess.kill(); // killed since otherwise the child process is never closed because we don't 
+                                                       // use process.exit() inside the game
+                        } else {
+                            actualBoard = [];
+                            moveCount++;
+                        }
+                    }
+                }
+            });
         });
     });
 });
