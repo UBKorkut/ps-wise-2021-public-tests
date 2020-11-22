@@ -1,5 +1,6 @@
 // Maybe use .strict
 const assert = require('assert');
+const os = require('os');
 
 const fs = require("fs");
 const path = require("path");
@@ -63,17 +64,10 @@ describe('Basic Tests', function() {
     describe('Runs with null exit code.  Tag: Assignment1, Assignment2, Assignment3, Assignment4, Assignment5', function() {
 
         var stdin;
+        var tempDir;
 
-        beforeEach("Ensure no simple.cfg before execution", function(){
-            if( fs.existsSync("simple.cfg")){
-                fs.unlinkSync("simple.cfg");
-            }
-        });
-
-        afterEach("Ensure no simple.cfg after execution", function(){
-            if( fs.existsSync("simple.cfg")){
-                fs.unlinkSync("simple.cfg");
-            }
+        beforeEach("Create temporary folder for file creation", function () {
+            tempDir = fs.mkdtempSync(os.tmpdir() + path.sep);
         });
 
         beforeEach("Start Mockin stdin", function(){
@@ -87,12 +81,12 @@ describe('Basic Tests', function() {
         it('Minesweeper should raise no exception', function() {
             // Creates the simple.cfg file
             const lines = ['..*', '...', '...'];
-            fs.writeFileSync("simple.cfg", lines.join('\n') + '\n')
+            fs.writeFileSync(tempDir + "/simple.cfg", lines.join('\n') + '\n')
             // Prepare the inputs
             // stdin.send("1 1 R", "ascii");
             
             // Execute Minesweeper. This should pick up the mocked stdin
-            var exitCode = minesweeper.main("simple.cfg")
+            var exitCode = minesweeper.main(tempDir + "/simple.cfg")
 
             assert.strictEqual(exitCode, 0, "Wrong exit for valid (won) game")
         });
@@ -100,7 +94,7 @@ describe('Basic Tests', function() {
         it('Win Minesweeper after first move', function() {
             // Creates the simple.cfg file
             const lines = ['..*', '...', '...'];
-            fs.writeFileSync("simple.cfg", lines.join('\n') + '\n')
+            fs.writeFileSync(tempDir + "/simple.cfg", lines.join('\n') + '\n')
             var lengthUI = (lines.length * 2 + 1) + 3; // first part for the board + three lines for the message box
 
             var expectedBoards = [
@@ -127,7 +121,7 @@ describe('Basic Tests', function() {
             ]
             
             // spawn child process to execute Minesweeper instance
-            minesweeperProcess = spawn('node', [minesweeperHome + "minesweeper.js", "simple.cfg"]);
+            minesweeperProcess = spawn('node', [minesweeperHome + "minesweeper.js", tempDir + "/simple.cfg"]);
             
             // send inputs to the subprocess
             minesweeperProcess.stdin.write("1 1 R\n");
