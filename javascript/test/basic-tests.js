@@ -42,7 +42,7 @@ describe('Basic Tests', function () {
 
         beforeEach("Create temporary folder for file creation", function () {
             tempDir = fs.mkdtempSync(os.tmpdir() + path.sep);
-            tempDir += '/';
+            tempDir += path.sep;
         });
 
         afterEach("Remove temporary folder for file creation", function () {
@@ -93,7 +93,7 @@ describe('Basic Tests', function () {
 
         beforeEach("Create temporary folder for file creation", function () {
             tempDir = fs.mkdtempSync(os.tmpdir() + path.sep);
-            tempDir += '/';
+            tempDir += path.sep;
         });
 
         afterEach("Remove temporary folder for file creation", function () {
