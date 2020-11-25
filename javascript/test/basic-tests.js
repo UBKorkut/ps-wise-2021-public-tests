@@ -42,6 +42,7 @@ describe('Basic Tests', function () {
 
         beforeEach("Create temporary folder for file creation", function () {
             tempDir = fs.mkdtempSync(os.tmpdir() + path.sep);
+            tempDir += '/';
         });
 
         afterEach("Remove temporary folder for file creation", function () {
@@ -63,7 +64,7 @@ describe('Basic Tests', function () {
         });
 
         it('Minesweeper should exit with code 1 if input file does not exist', function () {
-            minesweeperProcess = spawn('node', [minesweeperHome + "minesweeper.js", "simple.cfg"]);
+            minesweeperProcess = spawn('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"]);
 
             minesweeperProcess.on('close', (exitCode) => {
                 assert.strictEqual(exitCode, 1, "Wrong exit code for not existent board configuration file")
@@ -72,16 +73,11 @@ describe('Basic Tests', function () {
 
         it('Minesweeper should exit with code 2 if input file is invalid (empty)', function () {
             // Make sure there's an empty "simple.cfg" file (see https://flaviocopes.com/how-to-create-empty-file-node/)
-            fs.closeSync(fs.openSync(tempDir + "/simple.cfg", 'w'))
+            fs.closeSync(fs.openSync(tempDir + "simple.cfg", 'w'))
 
-            var stats = fs.statSync(tempDir + "/simple.cfg")
+            var stats = fs.statSync(tempDir + "simple.cfg")
 
-            minesweeperProcess = spawn('node', [minesweeperHome + "minesweeper.js", tempDir + "/simple.cfg"]);
-
-            const rl = readline.createInterface({ input: minesweeperProcess.stdout });
-            rl.on('line', line => {
-                console.log(line)
-            });
+            minesweeperProcess = spawn('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"]);
 
             minesweeperProcess.on('close', (exitCode) => {
                 assert.strictEqual(exitCode, 2, "Wrong exit code for invalid (empty) board configuration file")
@@ -97,6 +93,7 @@ describe('Basic Tests', function () {
 
         beforeEach("Create temporary folder for file creation", function () {
             tempDir = fs.mkdtempSync(os.tmpdir() + path.sep);
+            tempDir += '/';
         });
 
         afterEach("Remove temporary folder for file creation", function () {
@@ -120,9 +117,9 @@ describe('Basic Tests', function () {
         it('Minesweeper should raise no exception', function () {
             // Creates the simple.cfg file
             const lines = ['..*', '...', '...'];
-            fs.writeFileSync(tempDir + "/simple.cfg", lines.join('\n') + '\n')
+            fs.writeFileSync(tempDir + "simple.cfg", lines.join('\n') + '\n')
 
-            minesweeperProcess = spawn('node', [minesweeperHome + "minesweeper.js", tempDir + "/simple.cfg"]);
+            minesweeperProcess = spawn('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"]);
 
             // send inputs to the subprocess
             minesweeperProcess.stdin.write("1 1 R\n");
@@ -135,7 +132,7 @@ describe('Basic Tests', function () {
         it('Win Minesweeper after first move', function () {
             // Creates the simple.cfg file
             const lines = ['..*', '...', '...'];
-            fs.writeFileSync(tempDir + "/simple.cfg", lines.join('\n') + '\n')
+            fs.writeFileSync(tempDir + "simple.cfg", lines.join('\n') + '\n')
             var lengthUI = (lines.length * 2 + 1) + 3; // three lines for the message box
 
             var expectedBoards = [
@@ -162,7 +159,7 @@ describe('Basic Tests', function () {
             ]
 
             // spawn child process to execute Minesweeper instance
-            minesweeperProcess = spawn('node', [minesweeperHome + "minesweeper.js", tempDir + "/simple.cfg"]);
+            minesweeperProcess = spawn('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"]);
 
             // send inputs to the subprocess
             minesweeperProcess.stdin.write("1 1 R\n");
