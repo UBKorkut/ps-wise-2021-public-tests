@@ -57,13 +57,9 @@ public class ScenarioTest {
 		// TODO Move to upper folder in system independent way
 		File scenarioDirectory = new File("../test_scenarios");
 
-		System.out.println("\n\n\nScenarioTest.data() Collecting scenario tests from "
-				+ scenarioDirectory.getAbsolutePath() + "\n\n");
-
 		File[] scenarioList = scenarioDirectory.listFiles();
 		for (File scenarioFolder : scenarioList) {
 
-			System.out.println("ScenarioTest.data() " + scenarioFolder);
 			if (!scenarioFolder.isDirectory())
 				continue;
 
