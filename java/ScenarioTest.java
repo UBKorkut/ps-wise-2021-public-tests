@@ -1,16 +1,23 @@
+import java.io.File;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Scanner;
+import java.util.function.Consumer;
+
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.io.File;
-import java.io.PrintWriter;
-import java.util.*;
 
 /**
  * This class contains a simple parameterized test for testing scenarios
@@ -20,113 +27,202 @@ import java.util.*;
  */
 @RunWith(Parameterized.class)
 public class ScenarioTest {
-    public String testName;
-    public String config;
-    public ArrayList<String> inputs;
-    public String expectedOutput;
+	public String testName;
+	public String config;
+	public List<String> inputs;
+	public List<String> expectedOutput;
 
-    public ScenarioTest(String testName, String config, ArrayList<String> inputs, String expectedOutput) {
-        this.testName = testName;
-        this.config = config;
-        this.inputs = inputs;
-        this.expectedOutput = expectedOutput;
-    }
+	public ScenarioTest(String testName, String config, List<String> inputs, List<String> expectedOutput) {
+		this.testName = testName;
+		this.config = config;
+		this.inputs = inputs;
+		this.expectedOutput = expectedOutput;
+	}
 
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
+	@Rule
+	public TemporaryFolder tempFolder = new TemporaryFolder();
 
-    @BeforeClass
-    public static void checkPrecondition() {
-        /*
-         * Check that the required variables and configurations are set
-         */
-        MinesweeperTestUtils.validateTheExecutionEnvironment();
-    }
+	@BeforeClass
+	public static void checkPrecondition() {
+		/*
+		 * Check that the required variables and configurations are set
+		 */
+		MinesweeperTestUtils.validateTheExecutionEnvironment();
+	}
 
-    @Parameterized.Parameters(name="{0}")
-    public static Collection<Object[]> data() throws Exception {
-        ArrayList<Object[]> scenarioObjects = new ArrayList<>();
-        File scenarioDirectory = new File("test_scenarios");
+	@Parameterized.Parameters(name = "{0}")
+	public static Collection<Object[]> data() throws Exception {
 
-        File[] scenarioList = scenarioDirectory.listFiles();
-        if(scenarioList != null) {
-            for (File scenario : scenarioList) {
-                if (!scenario.isDirectory())
-                    continue;
+		ArrayList<Object[]> scenarioObjects = new ArrayList<>();
+		// TODO Move to upper folder in system independent way
+		File scenarioDirectory = new File("../test_scenarios");
 
-                File[] scenarioConfigFiles = scenario.listFiles();
-                if (scenarioConfigFiles == null ||
-                        scenarioConfigFiles.length != 2) continue;
+		System.out.println("\n\n\nScenarioTest.data() Collecting scenario tests from "
+				+ scenarioDirectory.getAbsolutePath() + "\n\n");
 
-                String testName = "";
-                ArrayList<String> inputs = new ArrayList<>();
-                StringBuilder expectedOutputBuilder = new StringBuilder(), configBuilder = new StringBuilder();
-                for (File scenarioConfigFile : scenarioConfigFiles) {
-                    testName = scenarioConfigFile.getName();
+		File[] scenarioList = scenarioDirectory.listFiles();
+		for (File scenarioFolder : scenarioList) {
 
-                    if (testName.endsWith("-input.txt")) {
+			System.out.println("ScenarioTest.data() " + scenarioFolder);
+			if (!scenarioFolder.isDirectory())
+				continue;
 
-                        // ******************************************************
-                        // process scenario input file
-                        // ******************************************************
+			File[] scenarioConfigFiles = scenarioFolder.listFiles();
 
-                        Scanner inputScanner = new Scanner(scenarioConfigFile);
+			String testName = "";
+			List<String> inputs = new ArrayList<>();
+			List<String> expectedOutput = new ArrayList<>();
+			StringBuilder configBuilder = new StringBuilder();
+			for (File scenarioConfigFile : scenarioConfigFiles) {
+				testName = scenarioConfigFile.getName();
 
-                        // first line is the board size
-                        int boardSize = inputScanner.nextInt();
-                        inputScanner.nextLine(); // skip \n at the end of the board size line
+				if (testName.endsWith("-input.txt")) {
 
-                        // read config file
-                        for (int i = 0; i < boardSize; i++) {
-                            configBuilder.append(inputScanner.nextLine()).append('\n');
-                        }
+					// ******************************************************
+					// process scenario input file. Read the user inputs
+					// ******************************************************
 
-                        // read user inputs for the game
-                        while (inputScanner.hasNext())
-                            inputs.add(inputScanner.nextLine());
+					try (Scanner inputScanner = new Scanner(scenarioConfigFile)) {
+						while (inputScanner.hasNext())
+							inputs.add(inputScanner.nextLine());
+					}
 
-                    } else {
+				} else if (testName.endsWith("-board.txt")) {
 
-                        // ******************************************************
-                        // process scenario expected output file
-                        // ******************************************************
+					// ******************************************************
+					// process scenario input file
+					// ******************************************************
 
-                        Scanner expectedOutputScanner = new Scanner(scenarioConfigFile);
-                        while (expectedOutputScanner.hasNext())
-                            expectedOutputBuilder.append(expectedOutputScanner.nextLine()).append('\n');
-                    }
-                }
+					try (Scanner boardScanner = new Scanner(scenarioConfigFile)) {
 
-                scenarioObjects.add(new Object[] {testName.substring(0, testName.indexOf('-')), configBuilder.toString(), inputs,
-                        expectedOutputBuilder.toString()});
-            }
-        }
+						// read board configuration inputs for the game
+						while (boardScanner.hasNext())
+							configBuilder.append(boardScanner.nextLine()).append('\n');
+					}
 
-        return scenarioObjects;
-    }
+				} else if (testName.endsWith("-expectedOutput.txt")) {
 
-    @Test
-    public void testScenario() throws Exception {
-        // code adapted from the BasicTest class
+					// ******************************************************
+					// process scenario expected output file
+					// ******************************************************
 
-        final File boardCfgFile = tempFolder.newFile("simple.cfg");
+					try (Scanner expectedOutputScanner = new Scanner(scenarioConfigFile)) {
+						while (expectedOutputScanner.hasNext())
+							expectedOutput.add(expectedOutputScanner.nextLine());
+					}
+				}
+			}
 
-        try (PrintWriter out = new PrintWriter(boardCfgFile)) {
-            out.print(config);
-        }
+			scenarioObjects.add(new Object[] { testName.substring(0, testName.indexOf('-')), configBuilder.toString(),
+					inputs, expectedOutput });
+		}
 
-        // Define the list of inputs to provide to Minesweeper
-        List<String> inputSequence = new ArrayList<>(inputs);
+		return scenarioObjects;
+	}
 
-        // Execute Minesweeper in a separate process starting it with the boardCfgFile
-        // and passing the inputSequence
-        Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, inputSequence);
-        String stdOut = (String) result.get("stdOut");
+	/**
+	 * This function takes three parameters and produce nothing
+	 * 
+	 * https://www.javatips.net/api/mdk-master/src/main/java/gov/nasa/jpl/mbee/mdk/api/function/TriConsumer.java
+	 * 
+	 * Created by igomes on 9/15/16.
+	 *
+	 * Represents an operation that accepts three input arguments and returns no
+	 * result. This is the three-arity specialization of {@link Consumer}. Unlike
+	 * most other functional interfaces, {@code TriConsumer} is expected to operate
+	 * via side-effects.
+	 * <p>
+	 * <p>
+	 * This is a <a href="package-summary.html">functional interface</a> whose
+	 * functional method is {@link #accept(Object, Object, Object)}.
+	 *
+	 * @param <T> the type of the first argument to the operation
+	 * @param <U> the type of the second argument to the operation
+	 * @param <V> the type of the third argument to the operation
+	 * @see Consumer
+	 * @since 1.8
+	 */
+	@FunctionalInterface
+	public interface TriConsumer<T, U, V> {
 
-        // Assertions
+		/**
+		 * Performs this operation on the given arguments.
+		 *
+		 * @param t the first input argument
+		 * @param u the second input argument
+		 */
+		void accept(T t, U u, V v);
 
-        // Did program produce the correct output?
-        MatcherAssert.assertThat(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " did not produce the expected output!", stdOut,
-                Matchers.equalTo(expectedOutput));
-    }
+		/**
+		 * Returns a composed {@code BiConsumer} that performs, in sequence, this
+		 * operation followed by the {@code after} operation. If performing either
+		 * operation throws an exception, it is relayed to the caller of the composed
+		 * operation. If performing this operation throws an exception, the
+		 * {@code after} operation will not be performed.
+		 *
+		 * @param after the operation to perform after this operation
+		 * @return a composed {@code BiConsumer} that performs in sequence this
+		 *         operation followed by the {@code after} operation
+		 * @throws NullPointerException if {@code after} is null
+		 */
+		default TriConsumer<T, U, V> andThen(TriConsumer<? super T, ? super U, ? super V> after) {
+			Objects.requireNonNull(after);
+
+			return (l, r, s) -> {
+				accept(l, r, s);
+				after.accept(l, r, s);
+			};
+		}
+	}
+
+	/**
+	 * This method
+	 * 
+	 * @param <T1>
+	 * @param <T2>
+	 * @param c1
+	 * @param c2
+	 * @param consumer
+	 */
+	private static <T1, T2> void iterateSimultaneously(Iterable<T1> c1, Iterable<T2> c2,
+			TriConsumer<T1, T2, Integer> consumer) {
+		Iterator<T1> i1 = c1.iterator();
+		Iterator<T2> i2 = c2.iterator();
+		int index = 0;
+		while (i1.hasNext() && i2.hasNext()) {
+			index = index + 1;
+			consumer.accept(i1.next(), i2.next(), index);
+		}
+	}
+
+	@Test
+	public void testScenario() throws Exception {
+		// code adapted from the BasicTest class
+
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			out.print(config);
+		}
+
+		// Define the list of inputs to provide to Minesweeper
+		List<String> inputSequence = new ArrayList<>(inputs);
+
+		// Execute Minesweeper in a separate process starting it with the boardCfgFile
+		// and passing the inputSequence
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, inputSequence);
+		String stdOut = (String) result.get("stdOut");
+
+		List<String> actualOutputLines = Arrays.asList(stdOut.split("\n"));
+
+		// Report only the first difference
+		iterateSimultaneously(actualOutputLines, expectedOutput,
+				(String actualLine, String expectedLine, Integer lineNumber) -> {
+					MatcherAssert.assertThat(
+							MinesweeperTestUtils.MINESWEEPER_CLASS_NAME
+									+ " did not produce the expected output on Line " + lineNumber,
+							actualLine, Matchers.equalTo(expectedLine));
+				});
+
+	}
 }
