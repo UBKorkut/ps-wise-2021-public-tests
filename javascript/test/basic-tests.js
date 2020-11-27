@@ -89,7 +89,7 @@ describe('Basic Tests (Public)', function () {
             const lines = ['..*', '...', '...'];
             fs.writeFileSync(tempDir + "simple.cfg", lines.join('\n') + '\n')
 
-            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], { input : "1 1 R", timeout : 3000});
+            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], { input : "1 1 R\n", timeout : 3000});
 
             assert.strictEqual(minesweeperProcess.status, 0, "Wrong exit for valid (won) game")
         });
@@ -125,7 +125,7 @@ describe('Basic Tests (Public)', function () {
 
             // spawn child process to execute Minesweeper instance
             // and send inputs to the subprocess
-            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], {input : "1 1 R", timeout : 3000});
+            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], {input : "1 1 R\n", timeout : 3000});
             
             assert.strictEqual(minesweeperProcess.status, 0, "Wrong exit for valid (won) game")
             // We cannot do '\n' join because of the console character '>'
