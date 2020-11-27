@@ -5,9 +5,8 @@ const os = require('os');
 const fs = require("fs");
 const path = require("path");
 
-const { stdin } = require('mock-stdin');
 const { spawnSync } = require('child_process');
-const readline = require('readline');
+
 
 // taken and adapted from: https://stackoverflow.com/questions/18052762/remove-directory-which-is-not-empty
 const deleteFolderWithFiles = function (dir) {
@@ -25,7 +24,7 @@ const minesweeperHome = process.env.npm_config_minesweeper_home.endsWith("/")
     : process.env.npm_config_minesweeper_home + "/";
 const minesweeper = require(minesweeperHome + "minesweeper");
 
-describe('Basic Tests', function () {
+describe('Basic Tests (Public)', function () {
 
     describe('Runs correct version of node. Tag: Assignment1, Assignment2, Assignment3, Assignment4, Assignment5', function () {
         it('Version of node must be v10.23.0', function () {
@@ -73,7 +72,6 @@ describe('Basic Tests', function () {
 
     describe('Runs with null exit code.  Tag: Assignment1, Assignment2, Assignment3, Assignment4, Assignment5', function () {
 
-        var stdin;
         var tempDir;
         var minesweeperProcess;
 
@@ -84,14 +82,6 @@ describe('Basic Tests', function () {
 
         afterEach("Remove temporary folder for file creation", function () {
             deleteFolderWithFiles(tempDir);
-        });
-
-        beforeEach("Start Mockin stdin", function () {
-            stdin = require('mock-stdin').stdin();
-        });
-
-        afterEach("Stop Mocking stdin", function () {
-            stdin.end();
         });
 
         it('Minesweeper should raise no exception', function () {
