@@ -52,12 +52,12 @@ describe('Basic Tests (Public)', function () {
         });
 
         it('Minesweeper should exit with code 1 if input file is not provided', function () {
-            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js"], {timeout: 3000} )
+            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js"], { timeout: 3000 })
             assert.strictEqual(minesweeperProcess.status, 1, "Wrong exit code for missing board configuration file")
         });
 
         it('Minesweeper should exit with code 1 if input file does not exist', function () {
-            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], {timeout: 3000} )
+            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], { timeout: 3000 })
             assert.strictEqual(minesweeperProcess.status, 1, "Wrong exit code for not existent board configuration file")
         });
 
@@ -65,7 +65,7 @@ describe('Basic Tests (Public)', function () {
             // Make sure there's an empty "simple.cfg" file (see https://flaviocopes.com/how-to-create-empty-file-node/)
             fs.closeSync(fs.openSync(tempDir + "simple.cfg", 'w'))
             var stats = fs.statSync(tempDir + "simple.cfg")
-            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], {timeout: 3000} )
+            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], { timeout: 3000 })
             assert.strictEqual(minesweeperProcess.status, 2, "Wrong exit code for invalid (empty) board configuration file")
         });
     });
@@ -89,7 +89,17 @@ describe('Basic Tests (Public)', function () {
             const lines = ['..*', '...', '...'];
             fs.writeFileSync(tempDir + "simple.cfg", lines.join('\n') + '\n')
 
-            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], { input : "1 1 R\n", timeout : 3000});
+            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], { input: "1 1 R\n", timeout: 3000 });
+
+            assert.strictEqual(minesweeperProcess.status, 0, "Wrong exit for valid (won) game")
+        });
+
+        it('Minesweeper should raise no exception with multiple input parameters', function () {
+            // Creates the simple.cfg file
+            const lines = ['..*', '...', '...'];
+            fs.writeFileSync(tempDir + "simple.cfg", lines.join('\n') + '\n')
+
+            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg", "Ignore"], { input: "1 1 R\n", timeout: 3000 });
 
             assert.strictEqual(minesweeperProcess.status, 0, "Wrong exit for valid (won) game")
         });
@@ -100,40 +110,40 @@ describe('Basic Tests (Public)', function () {
             fs.writeFileSync(tempDir + "simple.cfg", lines.join('\n') + '\n')
 
             var expectedOutput = [
-                  "┌───┬───┬───┐\n",
-                  "│   │   │   │\n",
-                  "├───┼───┼───┤\n",
-                  "│   │   │   │\n",
-                  "├───┼───┼───┤\n",
-                  "│   │   │   │\n",
-                  "└───┴───┴───┘\n",
-                  "╔═══════════╗\n",
-                  "║           ║\n",
-                  "╚═══════════╝\n",
-                  ">",
-                  "┌───┬───┬───┐\n",
-                  "│ ▓ │ 1 │   │\n",
-                  "├───┼───┼───┤\n",
-                  "│ ▓ │ 1 │ 1 │\n",
-                  "├───┼───┼───┤\n",
-                  "│ ▓ │ ▓ │ ▓ │\n",
-                  "└───┴───┴───┘\n",
-                  "╔═══════════╗\n",
-                  "║You Won!   ║\n",
-                  "╚═══════════╝\n",
+                "┌───┬───┬───┐\n",
+                "│   │   │   │\n",
+                "├───┼───┼───┤\n",
+                "│   │   │   │\n",
+                "├───┼───┼───┤\n",
+                "│   │   │   │\n",
+                "└───┴───┴───┘\n",
+                "╔═══════════╗\n",
+                "║           ║\n",
+                "╚═══════════╝\n",
+                ">",
+                "┌───┬───┬───┐\n",
+                "│ ▓ │ 1 │   │\n",
+                "├───┼───┼───┤\n",
+                "│ ▓ │ 1 │ 1 │\n",
+                "├───┼───┼───┤\n",
+                "│ ▓ │ ▓ │ ▓ │\n",
+                "└───┴───┴───┘\n",
+                "╔═══════════╗\n",
+                "║You Won!   ║\n",
+                "╚═══════════╝\n",
             ]
 
             // spawn child process to execute Minesweeper instance
             // and send inputs to the subprocess
-            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], {input : "1 1 R\n", timeout : 3000});
-            
+            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], { input: "1 1 R\n", timeout: 3000 });
+
             assert.strictEqual(minesweeperProcess.status, 0, "Wrong exit for valid (won) game")
             // We cannot do '\n' join because of the console character '>'
             // Note that we need to call toString() on stdout
             assert.strictEqual(minesweeperProcess.stdout.toString(), expectedOutput.join(''), "Wrong output")
             // instead of checking one by one the boars, we assert over the entire output
 
-            
+
         });
     });
 });
