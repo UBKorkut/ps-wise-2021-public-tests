@@ -45,7 +45,7 @@ describe('Config File Tests', function () {
 
         it('Minesweeper exit because of invalid extension', function () {
             // Creates the simple.cfg file
-            const lines = ['..*', '.,.', '...'];
+            const lines = ['..*', '...', '...'];
             fs.writeFileSync(tempDir + "simple", lines.join('\n') + '\n')
 
             minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple"], { timeout: 3000 })
@@ -98,19 +98,16 @@ describe('Config File Tests', function () {
         });
 
         it('Minesweeper exit because more than 20 columns', function () {
-            // Creates the simple.cfg file
-            const lines = ['....................*', '.....................'];
-            fs.writeFileSync(tempDir + "simple.cfg", lines.join('\n') + '\n')
+            // Creates the simple.cfg file with 21 columns
+            fs.writeFileSync(tempDir + "simple.cfg", '.'.repeat(20) + '*\n')
 
             minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], { timeout: 3000 })
             assert.strictEqual(minesweeperProcess.status, 2, "Wrong exit code for invalid (too many columns) board configuration file")
         });
 
         it('Minesweeper exit because more than 20 rows', function () {
-            // Creates the simple.cfg file
-            const lines = ['..*', '...', '...', '...', '...', '...', '...', '...', '...', '...', '...', '...'
-                , '...', '...', '...', '...', '...', '...', '...', '...', '...'];
-            fs.writeFileSync(tempDir + "simple.cfg", lines.join('\n') + '\n')
+            // Creates the simple.cfg file with 21 rows
+            fs.writeFileSync(tempDir + "simple.cfg", '..*\n' + '...\n'.repeat(20));
 
             minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], { timeout: 3000 })
             assert.strictEqual(minesweeperProcess.status, 2, "Wrong exit code for invalid (too many rows) board configuration file")
@@ -144,19 +141,16 @@ describe('Config File Tests', function () {
         });
 
         it('Minesweeper with board 1x20', function () {
-            // Creates the simple.cfg file
-            const lines = ['...................*'];
-            fs.writeFileSync(tempDir + "simple.cfg", lines.join('\n') + '\n')
+            // Creates the simple.cfg file with 20 columns
+            fs.writeFileSync(tempDir + "simple.cfg", '.'.repeat(19) + '*\n')
 
             minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], { input: "1 1 R\n", timeout: 3000 });
             assert.strictEqual(minesweeperProcess.status, 0, "Wrong exit for valid (won) game")
         });
 
         it('Minesweeper with board 20x1', function () {
-            // Creates the simple.cfg file
-            const lines = ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'
-                , '.', '*'];
-            fs.writeFileSync(tempDir + "simple.cfg", lines.join('\n') + '\n')
+            // Creates the simple.cfg file with 20 rows
+            fs.writeFileSync(tempDir + "simple.cfg", '.\n'.repeat(19) + '*\n');
 
             minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], { input: "1 1 R\n", timeout: 3000 });
             assert.strictEqual(minesweeperProcess.status, 0, "Wrong exit for valid (won) game")

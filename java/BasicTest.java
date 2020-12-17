@@ -190,4 +190,160 @@ public class BasicTest {
 				MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted configuration that is not rectangular", 2,
 				exitCode);
 	}
+
+	@Test(timeout = 3000)
+	public void testBoardWithoutMines() throws Exception {
+		// Setup: Provide the configuration file
+		//
+		// Create a temporary file.
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		// Write the simple 3x3 board to the file
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			out.println("...");
+			out.println("...");
+			out.println("...");
+		}
+
+		// Execute Minesweeper in a separate process starting it with the boardCfgFile
+		// and passing the inputSequence
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, new ArrayList<>() {{ add("1 1 R"); }});
+
+		int exitCode = (Integer) result.get("exitCode");
+		String stdError = (String) result.get("stdError");
+
+		// Assertions
+
+		// Did the program exit normally?
+		Assert.assertEquals(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " did not accept board without mines. Error message: "
+				+ stdError + "\n", 0, exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testBoardWithRow20Col1() throws Exception {
+		// Setup: Provide the configuration file
+		//
+		// Create a temporary file.
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		// Write the simple 3x3 board to the file
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			for (int i = 0; i < 19; i++) {
+				out.println(".");
+			}
+
+			// print row #20
+			out.println("*");
+		}
+
+		// Execute Minesweeper in a separate process starting it with the boardCfgFile
+		// and passing the inputSequence
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, new ArrayList<>() {{ add("1 1 R"); }});
+
+		int exitCode = (Integer) result.get("exitCode");
+		String stdError = (String) result.get("stdError");
+
+		// Assertions
+
+		// Did the program exit normally?
+		Assert.assertEquals(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " did not accept board with size 20x1. Error message: "
+				+ stdError + "\n", 0, exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testBoardWithRow1Col20() throws Exception {
+		// Setup: Provide the configuration file
+		//
+		// Create a temporary file.
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		// Write the simple 3x3 board to the file
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			for (int i = 0; i < 19; i++) {
+				out.print(".");
+			}
+
+			// print column #20
+			out.print("*\n");
+		}
+
+		// Execute Minesweeper in a separate process starting it with the boardCfgFile
+		// and passing the inputSequence
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, new ArrayList<>() {{ add("1 1 R"); }});
+
+		int exitCode = (Integer) result.get("exitCode");
+		String stdError = (String) result.get("stdError");
+
+		// Assertions
+
+		// Did the program exit normally?
+		Assert.assertEquals(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " did not accept board with size 1x20. Error message: "
+				+ stdError + "\n", 0, exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testBoardMoreThan20Rows() throws Exception {
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			for (int i = 0; i < 21; i++) {
+				out.println("...");
+			}
+		}
+
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+
+		Assert.assertEquals(
+				MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted configuration that has more than 20 rows", 2,
+				exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testBoardMoreThan20Columns() throws Exception {
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			for (int i = 0; i < 21; i++) {
+				out.print(".");
+			}
+
+			out.print("\n");
+		}
+
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+
+		Assert.assertEquals(
+				MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted configuration that has more than 20 columns", 2,
+				exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testConfigurationSingleSquare() throws Exception {
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			out.println(".");
+		}
+
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+
+		Assert.assertEquals(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted configuration with a single square", 2, exitCode);
+	}
+
+	@Test(timeout = 3000)
+	public void testConfigurationContainOnlyMines() throws Exception {
+		final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+		try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+			out.println("***");
+		}
+
+		Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
+		int exitCode = (Integer) result.get("exitCode");
+
+		Assert.assertEquals(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted configuration with mines only", 2, exitCode);
+	}
 }

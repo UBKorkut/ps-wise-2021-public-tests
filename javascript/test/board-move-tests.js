@@ -287,7 +287,7 @@ describe('Board Move Tests', function () {
 
             // spawn child process to execute Minesweeper instance
             // and send inputs to the subprocess
-            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], { input: "1.0 1 r\n1 1 R\n", timeout: 3000 });
+            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], { input: "1.0 1 R\n1 1 R\n", timeout: 3000 });
 
             assert.strictEqual(minesweeperProcess.status, 0, "Wrong exit for valid (won) game")
             // We cannot do '\n' join because of the console character '>'
