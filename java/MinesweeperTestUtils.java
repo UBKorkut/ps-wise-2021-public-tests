@@ -108,7 +108,9 @@ public class MinesweeperTestUtils {
 		List<String> _args = new ArrayList<String>();
 		_args.add(getJava());
 		_args.add(getEncoding());
-
+		// Ensure that relevant system variables are passed as well 
+		_args.add("-D"+MINESWEEPER_HOME+"="+getMinesweeper());
+        
 		// In order to correctly invoke Minesweeper we need to set its class path
 		_args.add("-cp");
 		_args.add(getMinesweeper());
