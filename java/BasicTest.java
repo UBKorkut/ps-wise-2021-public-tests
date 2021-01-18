@@ -62,8 +62,6 @@ public class BasicTest {
         try (PrintWriter pw = new PrintWriter(configIni)) {
             pw.println("plugin-name=default");
         }
-
-        System.out.println("Created " + configIni.getAbsolutePath());
     }
 
     @After
@@ -75,7 +73,6 @@ public class BasicTest {
                 Assert.fail("Cannot delete " + configIni.getAbsolutePath());
             }
         }
-        System.out.println("Deleted " + configIni.getAbsolutePath());
     }
 
     @Test(timeout = 3000)

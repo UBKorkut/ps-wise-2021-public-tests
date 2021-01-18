@@ -208,8 +208,6 @@ public class ScenarioTest {
         try (PrintWriter pw = new PrintWriter(configIni)) {
             pw.println("plugin-name=default");
         }
-
-        System.out.println("Created " + configIni.getAbsolutePath());
     }
 
     @After
@@ -221,7 +219,6 @@ public class ScenarioTest {
                 Assert.fail("Cannot delete " + configIni.getAbsolutePath());
             }
         }
-        System.out.println("Deleted " + configIni.getAbsolutePath());
     }
 
     @Test
