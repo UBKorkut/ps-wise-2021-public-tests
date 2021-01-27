@@ -359,5 +359,83 @@ describe('Aspects Tests', function () {
             assert.strictEqual(minesweeperProcess.stdout.toString(), expectedOutput.join(''), "Wrong output")
             // instead of checking one by one the boars, we assert over the entire output
         });
+
+        it('Win Minesweeper after 3 steps where one increments both mines and moves', function () {
+            // Creates the simple.cfg file
+            const lines = ['..*', '...', '...'];
+            fs.writeFileSync(tempDir + "simple.cfg", lines.join('\n') + '\n')
+
+            var expectedOutput = [
+                "╔═══════════╗\n",
+                "║Mines: 1   ║\n",
+                "║Moves: 0   ║\n",
+                "╚═══════════╝\n",
+                "┌───┬───┬───┐\n",
+                "│   │   │   │\n",
+                "├───┼───┼───┤\n",
+                "│   │   │   │\n",
+                "├───┼───┼───┤\n",
+                "│   │   │   │\n",
+                "└───┴───┴───┘\n",
+                "╔═══════════╗\n",
+                "║           ║\n",
+                "╚═══════════╝\n",
+                ">",
+                "╔═══════════╗\n",
+                "║Mines: 0   ║\n",
+                "║Moves: 0   ║\n",
+                "╚═══════════╝\n",
+                "┌───┬───┬───┐\n",
+                "│   │   │   │\n",
+                "├───┼───┼───┤\n",
+                "│   │ ¶ │   │\n",
+                "├───┼───┼───┤\n",
+                "│   │   │   │\n",
+                "└───┴───┴───┘\n",
+                "╔═══════════╗\n",
+                "║           ║\n",
+                "╚═══════════╝\n",
+                ">",
+                "╔═══════════╗\n",
+                "║Mines: 1   ║\n",
+                "║Moves: 1   ║\n",
+                "╚═══════════╝\n",
+                "┌───┬───┬───┐\n",
+                "│   │   │   │\n",
+                "├───┼───┼───┤\n",
+                "│   │ 1 │   │\n",
+                "├───┼───┼───┤\n",
+                "│   │   │   │\n",
+                "└───┴───┴───┘\n",
+                "╔═══════════╗\n",
+                "║           ║\n",
+                "╚═══════════╝\n",
+                ">",
+                "╔═══════════╗\n",
+                "║Mines: 0   ║\n",
+                "║Moves: 2   ║\n",
+                "╚═══════════╝\n",
+                "┌───┬───┬───┐\n",
+                "│ ▓ │ 1 │   │\n",
+                "├───┼───┼───┤\n",
+                "│ ▓ │ 1 │ 1 │\n",
+                "├───┼───┼───┤\n",
+                "│ ▓ │ ▓ │ ▓ │\n",
+                "└───┴───┴───┘\n",
+                "╔═══════════╗\n",
+                "║You Won!   ║\n",
+                "╚═══════════╝\n",
+            ]
+
+            // spawn child process to execute Minesweeper instance
+            // and send inputs to the subprocess
+            minesweeperProcess = spawnSync('node', [minesweeperHome + "minesweeper.js", tempDir + "simple.cfg"], { input: "2 2 F\n2 2 R\n1 1 R\n", timeout: 3000 });
+
+            assert.strictEqual(minesweeperProcess.status, 0, "Wrong exit for valid (won) game")
+            // We cannot do '\n' join because of the console character '>'
+            // Note that we need to call toString() on stdout
+            assert.strictEqual(minesweeperProcess.stdout.toString(), expectedOutput.join(''), "Wrong output")
+            // instead of checking one by one the boars, we assert over the entire output
+        });
     });
 });
