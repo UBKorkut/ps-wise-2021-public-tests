@@ -79,7 +79,7 @@ public class FancyTest {
         }
     }
 
-    @Test(timeout = 3000)
+    @Test(timeout = 1000)
     public void testFlagSymbol() throws Exception {
         // Create the board file
         final File boardCfgFile = tempFolder.newFile("simple.cfg");
@@ -130,7 +130,7 @@ public class FancyTest {
         Assert.assertEquals("Cannot find expected Flag at position (3, 3). " + stdOut, "F", contentOfCell);
     }
     
-    @Test(timeout = 3000)
+    @Test(timeout = 1000)
     public void testFlagUnflagSymbol() throws Exception {
         // Create the board file
         final File boardCfgFile = tempFolder.newFile("simple.cfg");
@@ -182,7 +182,7 @@ public class FancyTest {
 
     }
     
-    @Test(timeout = 3000)
+    @Test(timeout = 1000)
     public void testMineSymbol() throws Exception {
         // Create the board file
         final File boardCfgFile = tempFolder.newFile("simple.cfg");
@@ -223,7 +223,7 @@ public class FancyTest {
         Assert.assertEquals("Cannot find expected Mine at position (1, 3). " + stdOut, "M", contentOfCell);
     }
     
-    @Test(timeout = 3000)
+    @Test(timeout = 1000)
     public void testFineAllMines() throws Exception {
         // Create the board file
         final File boardCfgFile = tempFolder.newFile("simple.cfg");

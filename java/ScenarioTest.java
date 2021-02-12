@@ -221,7 +221,7 @@ public class ScenarioTest {
         }
     }
 
-    @Test
+    @Test(timeout = 1000)
     public void testScenario() throws Exception {
         // code adapted from the BasicTest class
 
