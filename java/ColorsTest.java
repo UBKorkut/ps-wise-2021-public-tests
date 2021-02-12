@@ -142,7 +142,7 @@ public class ColorsTest {
         return Pattern.compile(thePattern);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testThatNoColorsOnStartup() throws Exception {
         // Setup: Provide the configuration file
         //
@@ -183,7 +183,7 @@ public class ColorsTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testThatOneIsCorrectlyColored() throws Exception {
         // Setup: Provide the configuration file
         //
@@ -234,7 +234,7 @@ public class ColorsTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testThatTwoIsCorrectlyColored() throws Exception {
         // Setup: Provide the configuration file
         //
@@ -285,7 +285,7 @@ public class ColorsTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testThatThreeIsCorrectlyColored() throws Exception {
         // Setup: Provide the configuration file
         //
@@ -336,7 +336,7 @@ public class ColorsTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testThatFourIsCorrectlyColored() throws Exception {
         // Setup: Provide the configuration file
         //
@@ -383,7 +383,7 @@ public class ColorsTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testThatFiveIsCorrectlyColored() throws Exception {
         // Setup: Provide the configuration file
         //
@@ -434,7 +434,7 @@ public class ColorsTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testThatSixIsCorrectlyColored() throws Exception {
         // Setup: Provide the configuration file
         //
@@ -485,7 +485,7 @@ public class ColorsTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testThatSevenIsCorrectlyColored() throws Exception {
         // Setup: Provide the configuration file
         //
@@ -536,7 +536,7 @@ public class ColorsTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testThatEightIsCorrectlyColored() throws Exception {
         // Setup: Provide the configuration file
         //

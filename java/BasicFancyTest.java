@@ -79,7 +79,7 @@ public class BasicFancyTest {
         }
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testThatGivenCorrectInputsTheProgramExitNormally() throws Exception {
         // Setup: Provide the configuration file
         //
@@ -117,7 +117,7 @@ public class BasicFancyTest {
                 Matchers.not(blankOrNullString()));
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testNoConfigurationPassed() throws Exception {
         Map<String, Object> result = MinesweeperTestUtils.execute(null, Collections.emptyList());
         int exitCode = (Integer) result.get("exitCode");
@@ -126,7 +126,7 @@ public class BasicFancyTest {
                 exitCode);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testConfigurationNotExisting() throws Exception {
         Map<String, Object> result = MinesweeperTestUtils.execute(new File("nope.cfg"), Collections.emptyList());
         int exitCode = (Integer) result.get("exitCode");
@@ -135,7 +135,7 @@ public class BasicFancyTest {
                 exitCode);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testConfigurationIsNotARegularFile() throws Exception {
         File folder = tempFolder.newFolder("simple.cfg");
         Map<String, Object> result = MinesweeperTestUtils.execute(folder, Collections.emptyList());
@@ -148,7 +148,7 @@ public class BasicFancyTest {
                 2, exitCode);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testInvalidFilenameOnlySuffixMixedCase() throws Exception {
         final File boardCfgFile = tempFolder.newFile(".CfG");
         Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
@@ -157,7 +157,7 @@ public class BasicFancyTest {
                 exitCode);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testInvalidFilenameWrongSuffixFormat() throws Exception {
         final File boardCfgFile = tempFolder.newFile("test.ccfg");
         Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
@@ -166,7 +166,7 @@ public class BasicFancyTest {
                 exitCode);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testInvalidFilenameWrongSuffix() throws Exception {
         final File boardCfgFile = tempFolder.newFile("test.foo");
         Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
@@ -175,7 +175,7 @@ public class BasicFancyTest {
                 exitCode);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testEmptyConfiguration() throws Exception {
         final File boardCfgFile = tempFolder.newFile("simple.cfg");
 
@@ -189,7 +189,7 @@ public class BasicFancyTest {
         Assert.assertEquals(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME + " accepted empty configuration", 2, exitCode);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testInvalidContentInConfiguration() throws Exception {
         final File boardCfgFile = tempFolder.newFile("simple.cfg");
 
@@ -205,7 +205,7 @@ public class BasicFancyTest {
                 exitCode);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testNonRectangularConfiguration() throws Exception {
         final File boardCfgFile = tempFolder.newFile("simple.cfg");
 
@@ -222,7 +222,7 @@ public class BasicFancyTest {
                 exitCode);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testBoardWithoutMines() throws Exception {
         // Setup: Provide the configuration file
         //
@@ -254,7 +254,7 @@ public class BasicFancyTest {
                 + " did not accept board without mines. Error message: " + stdError + "\n", 0, exitCode);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testBoardWithRow20Col1() throws Exception {
         // Setup: Provide the configuration file
         //
@@ -289,7 +289,7 @@ public class BasicFancyTest {
                 + " did not accept board with size 20x1. Error message: " + stdError + "\n", 0, exitCode);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testBoardWithRow1Col20() throws Exception {
         // Setup: Provide the configuration file
         //
@@ -324,7 +324,7 @@ public class BasicFancyTest {
                 + " did not accept board with size 1x20. Error message: " + stdError + "\n", 0, exitCode);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testBoardMoreThan20Rows() throws Exception {
         final File boardCfgFile = tempFolder.newFile("simple.cfg");
 
@@ -342,7 +342,7 @@ public class BasicFancyTest {
                 exitCode);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testBoardMoreThan20Columns() throws Exception {
         final File boardCfgFile = tempFolder.newFile("simple.cfg");
 
@@ -362,7 +362,7 @@ public class BasicFancyTest {
                 2, exitCode);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testConfigurationSingleSquare() throws Exception {
         final File boardCfgFile = tempFolder.newFile("simple.cfg");
 
@@ -378,7 +378,7 @@ public class BasicFancyTest {
                 exitCode);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testConfigurationContainOnlyMines() throws Exception {
         final File boardCfgFile = tempFolder.newFile("simple.cfg");
 

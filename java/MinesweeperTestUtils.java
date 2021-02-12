@@ -12,155 +12,201 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assume;
 
 public class MinesweeperTestUtils {
 
-	public final static String MINESWEEPER_CLASS_NAME = "Minesweeper";
+    public final static String MINESWEEPER_CLASS_NAME = "Minesweeper";
 
-	public final static String MINESWEEPER_ENV = "MINESWEEPER_HOME";
-	public final static String MINESWEEPER_HOME = "minesweeper.home";
-	public final static String MINESWEEPER_NAME = "minesweeper.name";
-	public final static String JAVA = "minesweeper.java";
+    public final static String MINESWEEPER_ENV = "MINESWEEPER_HOME";
+    public final static String MINESWEEPER_HOME = "minesweeper.home";
+    public final static String MINESWEEPER_NAME = "minesweeper.name";
+    public final static String JAVA = "minesweeper.java";
 
-	private static String OS = System.getProperty("os.name").toLowerCase();
+    private static String OS = System.getProperty("os.name").toLowerCase();
 
-	/**
-	 * Check whether the requires system properties are correctly set. Not that if
-	 * any of those conditions fail the tests will be considered non meaningful;
-	 * consequently the will be SKIPPED. In other words, tests will not FAIL because
-	 * of non-met assumptions. </br>
-	 * 
-	 * @see <a href=
-	 *      "https://junit.org/junit4/javadoc/4.13/org/junit/Assume.html">https://junit.org/junit4/javadoc/4.13/org/junit/Assume.html</a>
-	 * 
-	 */
-	public static void validateTheExecutionEnvironment() {
-		Assume.assumeNotNull("MINESWEEPER_HOME is not set", getMinesweeper());
-		Assume.assumeNotNull("Java is not set", getJava());
-		// See https://www.baeldung.com/hamcrest-file-matchers
-		Assume.assumeThat("Cannot find MINESWEEPER_HOME", new File(getMinesweeper()), anExistingDirectory());
-		Assume.assumeThat("Cannot find " + getMinesweeperClassPath() + ".class",
-				new File(getMinesweeper(), getMinesweeperClassPath() + ".class"), anExistingFile());
-		// TODO Check if the java version returned by getJava() is indeed JAVA 11
-	}
+    /**
+     * Check whether the requires system properties are correctly set. Not that if
+     * any of those conditions fail the tests will be considered non meaningful;
+     * consequently the will be SKIPPED. In other words, tests will not FAIL because
+     * of non-met assumptions. </br>
+     * 
+     * @see <a href=
+     *      "https://junit.org/junit4/javadoc/4.13/org/junit/Assume.html">https://junit.org/junit4/javadoc/4.13/org/junit/Assume.html</a>
+     * 
+     */
+    public static void validateTheExecutionEnvironment() {
+        Assume.assumeNotNull("MINESWEEPER_HOME is not set", getMinesweeper());
+        Assume.assumeNotNull("Java is not set", getJava());
+        // See https://www.baeldung.com/hamcrest-file-matchers
+        Assume.assumeThat("Cannot find MINESWEEPER_HOME", new File(getMinesweeper()), anExistingDirectory());
+        Assume.assumeThat("Cannot find " + getMinesweeperClassPath() + ".class",
+                new File(getMinesweeper(), getMinesweeperClassPath() + ".class"), anExistingFile());
+        // TODO Check if the java version returned by getJava() is indeed JAVA 11
+    }
 
-	public static String getMinesweeper() {
-		return System.getProperty(MINESWEEPER_HOME);
-	}
+    public static String getMinesweeper() {
+        return System.getProperty(MINESWEEPER_HOME);
+    }
 
-	public static String getMinesweeperClassName() {
-		final String className = System.getProperty(MINESWEEPER_NAME);
+    public static String getMinesweeperClassName() {
+        final String className = System.getProperty(MINESWEEPER_NAME);
 
-		// old behaviour so that we do not break outdated makefiles.
-		if (className == null || className.isEmpty())
-			return MINESWEEPER_CLASS_NAME;
+        // old behaviour so that we do not break outdated makefiles.
+        if (className == null || className.isEmpty())
+            return MINESWEEPER_CLASS_NAME;
 
-		return className;
-	}
+        return className;
+    }
 
-	public static String getMinesweeperClassPath() {
-		return getMinesweeperClassName().replace('.', '/');
-	}
+    public static String getMinesweeperClassPath() {
+        return getMinesweeperClassName().replace('.', '/');
+    }
 
-	/**
-	 * Return the specified java environment or simply java, assuming that your java
-	 * is configured to be the java command from the JDK 11
-	 * 
-	 * @return
-	 */
-	public static String getJava() {
-		return System.getProperty(JAVA, "java");
-	}
+    /**
+     * Return the specified java environment or simply java, assuming that your java
+     * is configured to be the java command from the JDK 11
+     * 
+     * @return
+     */
+    public static String getJava() {
+        return System.getProperty(JAVA, "java");
+    }
 
-	// https://mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/
-	public static boolean isWindows() {
-		return (OS.indexOf("win") >= 0);
-	}
+    // https://mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/
+    public static boolean isWindows() {
+        return (OS.indexOf("win") >= 0);
+    }
 
-	public static String getEncoding() {
-		if (isWindows()) {
-			// Wrap the option in `"` for Windows. TODO Is this really necessary?
-			return '"' + "-Dfile.encoding=UTF-8" + '"';
-		} else {
-			return "-Dfile.encoding=UTF-8";
-		}
+    public static String getEncoding() {
+        if (isWindows()) {
+            // Wrap the option in `"` for Windows. TODO Is this really necessary?
+            return '"' + "-Dfile.encoding=UTF-8" + '"';
+        } else {
+            return "-Dfile.encoding=UTF-8";
+        }
 
-	}
+    }
 
-	/**
-	 * Execute the Minesweeper version pointed by getMinesweeper() with the given
-	 * program argument and inputSequence.
-	 * 
-	 * 
-	 * @param boardCfgFile
-	 * @param inputSequence
-	 * @return the exitCode and a copy of the stdOutput and stdError generated by
-	 *         the program
-	 * @throws Exception
-	 */
-	public static Map<String, Object> execute(File boardCfgFile, List<String> inputSequence) throws Exception {
-		List<String> _args = new ArrayList<String>();
-		_args.add(getJava());
-		_args.add(getEncoding());
-		// Ensure that relevant system variables are passed as well 
-		_args.add("-D"+MINESWEEPER_HOME+"="+getMinesweeper());
-        
-		// In order to correctly invoke Minesweeper we need to set its class path
-		_args.add("-cp");
-		_args.add(getMinesweeper());
-		_args.add(getMinesweeperClassName());
-		// Pass the configuration file if not null. Null simulates a missing file
-		if (boardCfgFile != null) {
-			_args.add(boardCfgFile.getAbsolutePath());
-		}
+    /**
+     * Execute the Minesweeper version pointed by getMinesweeper() with the given
+     * program argument and inputSequence.
+     * 
+     * 
+     * @param boardCfgFile
+     * @param inputSequence
+     * @return the exitCode and a copy of the stdOutput and stdError generated by
+     *         the program
+     * @throws Exception
+     */
+    public static Map<String, Object> execute(File boardCfgFile, List<String> inputSequence) throws Exception {
+        // Use a default timeout of 2 seconds
+        return execute(Collections.singletonList(boardCfgFile), inputSequence, 2);
+    }
 
-		// Start the process
-		ProcessBuilder pb = new ProcessBuilder(_args);
-		Process process = pb.start();
+    /**
+     * Execute the Minesweeper version pointed by getMinesweeper() with the given
+     * program arguments and inputSequence.
+     * 
+     * 
+     * @param commandLineInputs
+     * @param inputSequence
+     * @return the exitCode and a copy of the stdOutput and stdError generated by
+     *         the program
+     * @throws Exception
+     */
+    public static Map<String, Object> execute(List<File> commandLineInputs, List<String> inputSequence,
+            int timeoutInSeconds) throws Exception {
+        try {
+            List<String> _args = new ArrayList<String>();
+            _args.add(getJava());
+            _args.add(getEncoding());
+            // Ensure that environmental variables are set as well
+            _args.add("-D" + MINESWEEPER_HOME + "=" + getMinesweeper());
 
-		// Provides the inputs
-		try (PrintWriter stdinWriter = new PrintWriter(new OutputStreamWriter(process.getOutputStream()))) {
-			for (String input : inputSequence) {
-				stdinWriter.println(input);
-				// TODO Is this necessary?
-				stdinWriter.flush();
-			}
-		}
+            // In order to correctly invoke Minesweeper we need to set its class path
+            _args.add("-cp");
+            _args.add(getMinesweeper());
+            _args.add(getMinesweeperClassName());
+            // Pass the configuration files if not null. Null simulates a missing file
+            if (commandLineInputs != null) {
+                for (File f : commandLineInputs) {
+                    if (f != null) {
+                        _args.add(f.getAbsolutePath());
+                    }
+                }
+            }
 
-		// Capture the output and error
-		BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"));
-		StringBuilder builder = new StringBuilder();
-		String line = null;
-		while ((line = stdoutReader.readLine()) != null) {
-			builder.append(line);
-			builder.append(System.getProperty("line.separator"));
-		}
+            // Start the process
+            ProcessBuilder pb = new ProcessBuilder(_args);
+            Process process = pb.start();
 
-		BufferedReader stderrReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-		StringBuilder errorBuilder = new StringBuilder();
-		String errorLine = null;
-		while ((errorLine = stderrReader.readLine()) != null) {
-			errorBuilder.append(errorLine);
-			errorBuilder.append(System.getProperty("line.separator"));
-		}
+            // Provides the inputs
+            try (PrintWriter stdinWriter = new PrintWriter(new OutputStreamWriter(process.getOutputStream()))) {
+                for (String input : inputSequence) {
+                    stdinWriter.println(input);
+                    // TODO Is this necessary?
+                    stdinWriter.flush();
+                }
+            }
 
-		String stdOut = builder.toString();
-		String stdError = errorBuilder.toString();
-		int exitCode = process.waitFor();
+            // Capture the output and error
+            BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"));
+            StringBuilder builder = new StringBuilder();
+            String line = null;
+            while ((line = stdoutReader.readLine()) != null) {
+                builder.append(line);
+                builder.append(System.getProperty("line.separator"));
+            }
 
-		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("exitCode", exitCode);
-		result.put("stdOut", stdOut);
-		result.put("stdError", stdError);
+            BufferedReader stderrReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            StringBuilder errorBuilder = new StringBuilder();
+            String errorLine = null;
+            while ((errorLine = stderrReader.readLine()) != null) {
+                errorBuilder.append(errorLine);
+                errorBuilder.append(System.getProperty("line.separator"));
+            }
 
-		return result;
+            String stdOut = builder.toString();
+            String stdError = errorBuilder.toString();
 
-	}
+            // Make sure the subprocess ends, otherwise we might be stuck with zombies at
+            // some point
+            // Taken from:
+            // https://stackoverflow.com/questions/37043114/how-to-stop-a-command-being-executed-after-4-5-seconds-through-process-builder
+            process.waitFor(timeoutInSeconds, TimeUnit.SECONDS); // let the process run for 5 seconds
+            process.destroy(); // tell the process to stop
+            process.waitFor(timeoutInSeconds + 5, TimeUnit.SECONDS); // give it a chance to stop
+            process.destroyForcibly(); // tell the OS to kill the process
+            // Eventuallyu collect the
+            int exitCode = process.waitFor();
+
+            Map<String, Object> result = new HashMap<String, Object>();
+            result.put("exitCode", exitCode);
+            result.put("stdOut", stdOut);
+            result.put("stdError", stdError);
+
+            return result;
+        } catch (Throwable e) {
+            Map<String, Object> result = new HashMap<String, Object>();
+            result.put("exitCode", -123);
+            result.put("stdOut", "");
+            // Print stack trace to string
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            result.put("stdError", sw.toString());
+
+            return result;
+        }
+
+    }
 
 }

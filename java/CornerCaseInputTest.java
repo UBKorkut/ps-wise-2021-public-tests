@@ -46,7 +46,7 @@ public class CornerCaseInputTest {
         }
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testThatAdditionalInputsAreNotConsideredWhenWinningGameAndReveal() throws Exception {
         // Setup: Provide the configuration file
         //
@@ -98,7 +98,7 @@ public class CornerCaseInputTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testThatAdditionalInputsAreNotConsideredWhenWinningGameAndFlag() throws Exception {
         // Setup: Provide the configuration file
         //
@@ -151,7 +151,7 @@ public class CornerCaseInputTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 3000)
     public void testThatMissingInputsCauseTheGameToEndWithAMessage() throws Exception {
         // Setup: Provide the configuration file
         //
