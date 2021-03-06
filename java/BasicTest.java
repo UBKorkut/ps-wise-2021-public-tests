@@ -219,6 +219,22 @@ public class BasicTest {
     }
 
     @Test(timeout = 3000)
+    public void testMissingNewLineInLastLineOfConfiguration() throws Exception {
+        final File boardCfgFile = tempFolder.newFile("simple.cfg");
+
+        try (PrintWriter out = new PrintWriter(boardCfgFile)) {
+            out.println("...");
+            out.print("..*");
+        }
+
+        Map<String, Object> result = MinesweeperTestUtils.execute(boardCfgFile, Collections.emptyList());
+        int exitCode = (Integer) result.get("exitCode");
+
+        Assert.assertEquals(MinesweeperTestUtils.MINESWEEPER_CLASS_NAME
+                + " accepted configuration that is missing new line character in last line", 2, exitCode);
+    }
+
+    @Test(timeout = 3000)
     public void testBoardWithoutMines() throws Exception {
         // Setup: Provide the configuration file
         //
